@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="description" content="Aurix — a beautiful music player built for people who love music.">
+<title>Aurix — Feel Every Beat</title>
+
+<style>
+:root{
+  --orange:#ff6a00;
+  --orange2:#ff9d42;
+  --gold:#ffc46b;
+  --bg:#070708;
+  --card:rgba(255,255,255,.055);
+  --line:rgba(255,255,255,.10);
+  --text:#fff;
+  --muted:#a7a7ad;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+a,button{
+  -webkit-tap-highlight-color:transparent;
+  tap-highlight-color:transparent;
+}
+a:focus,a:active,button:focus,button:active{
+  outline:none;
+}
+
+.touch-pulse{
+  position:fixed;
+  width:18px;
+  height:18px;
+  border:1.5px solid rgba(255,154,74,.72);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%) scale(.45);
+  box-shadow:0 0 14px rgba(255,106,0,.28);
+  animation:touchPulse .42s cubic-bezier(.2,.75,.25,1) forwards;
+}
+
+@keyframes touchPulse{
+  0%{
+    opacity:.9;
+    transform:translate(-50%,-50%) scale(.45);
+  }
+  100%{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(2.8);
+  }
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,106,0,.18),transparent 32%),
+    radial-gradient(circle at 10% 50%,rgba(255,106,0,.07),transparent 25%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:55px 55px;
+  mask-image:linear-gradient(to bottom,black,transparent 75%);
+}
+a{text-decoration:none;color:inherit}
+section{position:relative;z-index:2}
+.container{width:min(1120px,92%);margin:auto}
+
+/* Top navigation */
+.nav{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  width:min(1050px,92%);z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px 11px 18px;
+  border:1px solid var(--line);
+  background:rgba(10,10,11,.62);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-radius:18px;
+  box-shadow:0 18px 60px rgba(0,0,0,.35);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.5px}
+.brand img{width:32px;height:32px;border-radius:50%;object-fit:cover;transform:scale(1.15);box-shadow:0 0 22px rgba(255,106,0,.38), 0 0 45px rgba(255,106,0,.16)}
+.brand span{font-size:20px}
+.navlinks{display:flex;gap:25px;color:#aaa;font-size:14px}
+.navlinks a{transition:.25s}
+.navlinks a:hover{color:white}
+.navbtn{
+  padding:10px 16px;border-radius:12px;background:#fff;color:#090909;
+  font-weight:750;font-size:13px;transition:.25s;box-shadow:0 0 0 rgba(255,106,0,0);
+}
+.navbtn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,106,0,.28)}
+
+/* Hero */
+.hero{min-height:100vh;display:grid;place-items:center;padding:130px 0 90px;overflow:hidden}
+.hero-inner{text-align:center;max-width:900px;margin:auto}
+.logo-wrap{
+  width:112px;height:112px;margin:0 auto 25px;border-radius:50%;
+  position:relative;animation:logoFloat 4s ease-in-out infinite;
+}
+.logo-wrap:before{
+  content:"";position:absolute;inset:-7px;border-radius:50%;
+  background:rgba(10,8,7,.92);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 0 0 1px rgba(255,106,0,.08),0 8px 28px rgba(0,0,0,.45);
+  z-index:-1;
+}
+.logo-wrap:after{
+  content:"";position:absolute;inset:-65px;border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,106,0,.58) 0%,
+    rgba(255,106,0,.25) 28%,
+    rgba(255,106,0,.10) 48%,
+    transparent 72%);
+  filter:blur(24px);
+  z-index:-1;
+  animation:heroGlow 3.5s ease-in-out infinite;
+}
+.logo-wrap img{width:100%;height:100%;border-radius:50%;object-fit:cover;transform:scale(1.28);display:block;box-shadow:0 0 24px rgba(255,106,0,.45), 0 0 70px rgba(255,106,0,.22), 0 20px 70px rgba(0,0,0,.28)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 12px;
+  border:1px solid rgba(255,106,0,.25);border-radius:999px;
+  background:rgba(255,106,0,.07);color:#ffb16f;font-size:12px;font-weight:700;
+  margin-bottom:18px;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 15px var(--orange)}
+h1{
+  font-size:clamp(58px,10vw,118px);line-height:.9;letter-spacing:-.075em;
+  margin-bottom:24px;
+  background:linear-gradient(110deg,#fff 15%,#fff 40%,#ffb66e 62%,#ff6a00 88%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p{max-width:650px;margin:auto;color:#aaa;font-size:clamp(16px,2vw,20px);line-height:1.7}
+.hero-actions{display:flex;justify-content:center;gap:12px;margin-top:32px;flex-wrap:wrap}
+.download{
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;
+  padding:15px 22px;border-radius:15px;background:linear-gradient(135deg,#ff6a00,#ff8f2f);
+  color:#fff;font-weight:800;border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 14px 45px rgba(255,106,0,.25);transition:.25s;
+}
+.download:before{
+  content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);animation:shine 3s infinite;
+}
+.download:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 20px 60px rgba(255,106,0,.38)}
+.download svg{width:20px;position:relative;z-index:1}
+.download span{position:relative;z-index:1}
+.secondary{
+  padding:15px 22px;border-radius:15px;border:1px solid var(--line);
+  color:#ddd;background:rgba(255,255,255,.04);font-weight:700;transition:.25s
+}
+.secondary:hover{background:rgba(255,255,255,.08);transform:translateY(-3px)}
+.scroll{
+  position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
+  color:#777;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+}
+.mouse{width:20px;height:32px;border:1px solid #777;border-radius:12px;position:relative}
+.mouse:after{content:"";width:3px;height:7px;border-radius:4px;background:var(--orange);position:absolute;left:50%;top:6px;transform:translateX(-50%);animation:wheel 1.5s infinite}
+
+/* Music symbols */
+.note{position:fixed;z-index:1;pointer-events:none;color:var(--orange);opacity:0;font-size:25px;text-shadow:0 0 20px rgba(255,106,0,.8)}
+.note.n1{left:8%;top:26%;animation:noteFloat 7s 1s infinite}
+.note.n2{right:10%;top:35%;animation:noteFloat 8s 2s infinite}
+.note.n3{left:18%;top:68%;animation:noteFloat 9s .4s infinite}
+.note.n4{right:20%;top:73%;animation:noteFloat 7s 2.5s infinite}
+
+/* Sections */
+.section{padding:75px 0}
+#features{padding-bottom:30px}
+#features + .section{padding-top:70px;padding-bottom:55px}
+.section-head{max-width:680px;margin-bottom:45px}
+.kicker{color:#ff9a4a;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:2px;margin-bottom:12px}
+h2{font-size:clamp(36px,6vw,66px);letter-spacing:-.055em;line-height:1.02;margin-bottom:16px}
+.lead{color:#999;line-height:1.75;font-size:17px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{
+  padding:30px;border-radius:24px;border:1px solid var(--line);
+  background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.025));
+  transition:.35s;position:relative;overflow:hidden;
+}
+.card:after{
+  content:"";position:absolute;width:150px;height:150px;right:-70px;bottom:-70px;
+  border-radius:50%;background:rgba(255,106,0,.10);filter:blur(15px)
+}
+.card:hover{transform:translateY(-8px);border-color:rgba(255,106,0,.35);box-shadow:0 25px 70px rgba(0,0,0,.3)}
+.icon{
+  width:50px;height:50px;border-radius:16px;display:grid;place-items:center;
+  background:rgba(255,106,0,.10);color:#ff9b4c;margin-bottom:20px
+}
+.icon svg{width:24px}
+.card h3{font-size:20px;margin-bottom:10px}
+.card p{color:#929297;line-height:1.65;font-size:14px}
+
+/* Visual showcase */
+.showcase{
+  min-height:550px;border:1px solid var(--line);border-radius:34px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(255,106,0,.18),transparent 30%),
+    linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.015));
+  display:grid;place-items:center;overflow:hidden;position:relative;
+}
+.orbit{position:absolute;width:430px;height:430px;border:1px solid rgba(255,106,0,.16);border-radius:50%;animation:spin 16s linear infinite}
+.orbit:before,.orbit:after{content:"♪";position:absolute;color:#ff7a20;font-size:28px;text-shadow:0 0 25px #ff6a00}
+.orbit:before{top:-14px;left:50%}.orbit:after{bottom:-14px;right:50%}
+.album{
+  width:230px;height:230px;border-radius:42px;position:relative;z-index:2;
+  box-shadow:0 35px 100px rgba(255,106,0,.30),0 25px 80px rgba(0,0,0,.5);
+  animation:albumFloat 4.5s ease-in-out infinite;
+}
+.album img{width:100%;height:100%;border-radius:42px;display:block}
+.wave{position:absolute;bottom:50px;display:flex;align-items:center;gap:5px;height:70px;z-index:3}
+.wave i{display:block;width:4px;border-radius:5px;background:linear-gradient(#ffb56b,#ff6a00);animation:wave 1s ease-in-out infinite}
+.wave i:nth-child(1){height:20px;animation-delay:.1s}.wave i:nth-child(2){height:45px;animation-delay:.25s}
+.wave i:nth-child(3){height:30px;animation-delay:.4s}.wave i:nth-child(4){height:60px;animation-delay:.15s}
+.wave i:nth-child(5){height:35px;animation-delay:.35s}.wave i:nth-child(6){height:50px;animation-delay:.5s}
+.wave i:nth-child(7){height:25px;animation-delay:.2s}
+
+/* CTA */
+.cta{
+  text-align:center;padding:80px 25px;border:1px solid rgba(255,106,0,.18);
+  border-radius:34px;background:
+    radial-gradient(circle at 50% 100%,rgba(255,106,0,.20),transparent 55%),
+    rgba(255,255,255,.025);
+}
+.cta p{color:#999;max-width:600px;margin:0 auto 28px;line-height:1.7}
+footer{padding:45px 0 55px;color:#666;font-size:13px;text-align:center}
+footer b{color:#999}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(45px);transition:opacity .8s ease,transform .8s ease}
+.reveal.show{opacity:1;transform:none}
+
+/* Animations */
+@keyframes logoFloat{50%{transform:translateY(-10px) rotate(1deg)}}
+@keyframes heroGlow{
+  0%,100%{opacity:.72;transform:scale(.94)}
+  50%{opacity:1;transform:scale(1.08)}
+}
+@keyframes albumFloat{50%{transform:translateY(-14px) rotate(1deg)}}
+@keyframes shine{0%{left:-120%}45%,100%{left:150%}}
+@keyframes wheel{50%{transform:translate(-50%,8px);opacity:.1}}
+@keyframes noteFloat{0%,100%{opacity:0;transform:translateY(25px) rotate(-10deg)}20%,80%{opacity:.65}50%{transform:translateY(-25px) rotate(10deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes wave{50%{transform:scaleY(.45)}}
+
+@media(max-width:800px){
+  .navlinks{display:none}
+  .features{grid-template-columns:1fr}
+  .hero{padding-top:120px}
+  .showcase{min-height:470px}
+  .orbit{width:320px;height:320px}
+  .album{width:185px;height:185px;border-radius:32px}
+  .album img{border-radius:32px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}
+}
+
+/* ===== Aurix Premium Landing Upgrade ===== */
+:root{--orange3:#ff7b22;--glass:rgba(255,255,255,.045)}
+body{background:radial-gradient(circle at 50% -5%,rgba(255,106,0,.22),transparent 30%),radial-gradient(circle at 90% 42%,rgba(255,106,0,.08),transparent 24%),radial-gradient(circle at 5% 78%,rgba(255,106,0,.06),transparent 25%),var(--bg)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E")}
+.premium-hero{position:relative;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:55px;max-width:1120px;margin:auto;padding:25px 0 35px}
+.hero-copy{text-align:left}.hero-copy .eyebrow{margin-bottom:20px}.hero-copy h1{font-size:clamp(58px,8vw,104px);margin-bottom:22px}.hero-copy h1 span{display:block;color:#fff;background:none;-webkit-text-fill-color:initial}.hero-copy h1 em{font-style:normal;background:linear-gradient(110deg,#fff 10%,#ffb66e 55%,#ff6a00 90%);-webkit-background-clip:text;background-clip:text;color:transparent}.hero-copy p{margin:0;max-width:590px}.premium-actions{justify-content:flex-start}
+.hero-visual{position:relative;min-height:540px;display:grid;place-items:center}.phone{width:min(285px,68vw);height:555px;border:7px solid #171719;border-radius:43px;background:#09090a;position:relative;z-index:3;box-shadow:0 35px 100px rgba(0,0,0,.65),0 0 80px rgba(255,106,0,.18);padding:11px;transform:rotate(3deg);transition:.5s}.phone:hover{transform:rotate(0deg) translateY(-8px)}.phone-screen{height:100%;border-radius:32px;overflow:hidden;position:relative;background:linear-gradient(165deg,#19110d 0%,#090909 42%,#050505 100%);padding:18px 15px}.phone-notch{width:88px;height:22px;border-radius:20px;background:#050505;position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:4}.phone-top{display:flex;justify-content:space-between;align-items:center;color:#aaa;font-size:11px;padding:7px 2px 25px}.phone-top b{color:#fff;font-size:16px}.phone-art{width:100%;aspect-ratio:1;border-radius:25px;object-fit:cover;box-shadow:0 22px 50px rgba(255,106,0,.22)}.phone-song{text-align:left;padding:18px 2px 8px}.phone-song b{display:block;font-size:19px;color:#fff;margin-bottom:5px}.phone-song span{color:#8f8f94;font-size:12px}.phone-progress{height:3px;background:rgba(255,255,255,.13);border-radius:4px;margin:18px 2px 7px;position:relative}.phone-progress:before{content:"";position:absolute;left:0;top:0;width:62%;height:100%;border-radius:4px;background:linear-gradient(90deg,#ff6a00,#ffc46b)}.phone-times{display:flex;justify-content:space-between;color:#666;font-size:9px}.phone-controls{display:flex;align-items:center;justify-content:space-around;margin-top:23px;color:#aaa}.phone-controls .play{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#ff6a00,#ff9d42);box-shadow:0 12px 30px rgba(255,106,0,.35)}.phone-controls svg{width:20px}.phone-floating{position:absolute;right:0;top:12%;width:205px;padding:16px;border:1px solid var(--line);background:rgba(16,16,17,.72);backdrop-filter:blur(18px);border-radius:20px;z-index:4;box-shadow:0 25px 60px rgba(0,0,0,.35);animation:floatCard 4s ease-in-out infinite}.phone-floating b{display:block;font-size:12px;margin-bottom:5px}.phone-floating span{font-size:10px;color:#888}.mini-bars{display:flex;align-items:center;gap:3px;height:26px;margin-top:10px}.mini-bars i{width:3px;border-radius:4px;background:#ff8a36;animation:miniWave 1s ease-in-out infinite}.mini-bars i:nth-child(1){height:9px}.mini-bars i:nth-child(2){height:19px;animation-delay:.1s}.mini-bars i:nth-child(3){height:13px;animation-delay:.2s}.mini-bars i:nth-child(4){height:23px;animation-delay:.3s}.mini-bars i:nth-child(5){height:11px;animation-delay:.4s}.visual-orb{position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,106,0,.26),transparent 68%);filter:blur(12px)}
+.product-section{padding-top:35px}.product-intro{text-align:center;max-width:700px;margin:0 auto 42px}.product-intro .kicker{margin-bottom:14px}.app-screens{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:end}.app-screen{min-height:390px;border:1px solid var(--line);border-radius:28px;padding:13px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.018));box-shadow:0 25px 70px rgba(0,0,0,.28);overflow:hidden}.app-screen:nth-child(2){transform:translateY(-22px)}.app-screen .screen-head{display:flex;justify-content:space-between;color:#aaa;font-size:11px;padding:8px 6px 15px}.screen-title{font-size:20px;color:#fff;font-weight:800;margin:10px 6px 16px}.fake-cover{height:205px;border-radius:20px;background:linear-gradient(145deg,#2b160a,#100d0a);display:grid;place-items:center;overflow:hidden}.fake-cover img{width:100%;height:100%;object-fit:cover;opacity:.92}.screen-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border-radius:15px;background:rgba(255,255,255,.035)}.screen-row img{width:42px;height:42px;border-radius:10px;object-fit:cover}.screen-row b{font-size:11px}.screen-row span{display:block;font-size:9px;color:#777;margin-top:3px}.section-symbols{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:32px}.symbol-card{text-align:center;padding:25px 18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.025)}.symbol-icon{width:46px;height:46px;border-radius:15px;margin:0 auto 14px;display:grid;place-items:center;color:#ff9a4a;border:1px solid rgba(255,106,0,.18);background:rgba(255,106,0,.07)}.symbol-card b{display:block;font-size:14px;margin-bottom:5px}.symbol-card span{font-size:12px;color:#777;line-height:1.5}.trust-strip{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}.trust-pill{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:999px;padding:8px 12px;color:#999;font-size:11px}.trust-pill strong{color:#ddd}
+.sticky-player{position:fixed;left:50%;bottom:18px;transform:translate(-50%,130px);width:min(570px,calc(100% - 28px));z-index:60;padding:10px 12px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(12,12,13,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 20px 65px rgba(0,0,0,.45);display:flex;align-items:center;gap:11px;transition:.45s cubic-bezier(.2,.8,.2,1)}.sticky-player.show{transform:translate(-50%,0)}.sticky-player img{width:43px;height:43px;border-radius:10px;object-fit:cover}.sticky-player .track{flex:1;min-width:0}.sticky-player b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sticky-player span{font-size:10px;color:#777}.sticky-play{width:38px;height:38px;border-radius:50%;border:0;background:#ff6a00;color:#fff;display:grid;place-items:center}.sticky-wave{display:flex;align-items:center;gap:2px;height:25px}.sticky-wave i{width:2px;height:10px;background:#ff9a4a;border-radius:2px;animation:miniWave .8s infinite}.sticky-wave i:nth-child(2){height:17px;animation-delay:.15s}.sticky-wave i:nth-child(3){height:7px;animation-delay:.3s}
+@keyframes floatCard{50%{transform:translateY(-12px)}}@keyframes miniWave{50%{transform:scaleY(.45);opacity:.55}}
+@media(max-width:800px){.premium-hero{grid-template-columns:1fr;gap:25px;padding-top:10px}.hero-copy{text-align:center}.hero-copy p{margin:auto}.premium-actions{justify-content:center}.hero-visual{min-height:500px}.phone-floating{right:3%;top:8%;width:165px}.app-screens{grid-template-columns:1fr}.app-screen:nth-child(2){transform:none}.section-symbols{grid-template-columns:1fr}}
+
+
+/* Original abstract audio artwork — no repeated app-icon mockups */
+.hero-art-visual{min-height:520px;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:34px;background:radial-gradient(ellipse at 50% 48%,rgba(255,106,0,.13),transparent 48%),linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.005))}
+.hero-art-halo{position:absolute;width:330px;height:330px;border-radius:50%;background:rgba(255,106,0,.16);filter:blur(75px)}.hero-art-grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:34px 34px;mask-image:radial-gradient(ellipse at center,#000,transparent 76%)}
+.hero-art-label{position:absolute;left:22px;right:22px;display:flex;justify-content:space-between;gap:10px;color:#777;font-size:8px;letter-spacing:1.5px}.label-top{top:22px}.label-bottom{bottom:22px}.hero-art-orbit{position:absolute;width:310px;height:310px;border:1px solid rgba(255,130,50,.17);border-radius:50%;transform:rotate(-25deg) scaleY(.55)}.orbit-one{animation:orbitBreath 7s ease-in-out infinite}.orbit-two{width:390px;height:390px;transform:rotate(35deg) scaleY(.55);border-color:rgba(255,255,255,.09);animation:orbitBreath 9s ease-in-out infinite reverse}
+.hero-art-spectrum{position:absolute;display:flex;align-items:center;justify-content:center;gap:5px;width:85%;height:210px;transform:rotate(-13deg);opacity:.8}.hero-art-spectrum i{width:5px;height:calc(18px + (var(--n,1)*6px));border-radius:10px;background:linear-gradient(180deg,#ffd09b,#ff6a00 55%,rgba(255,106,0,.05));box-shadow:0 0 15px rgba(255,106,0,.14);animation:spectrumMove 1.35s ease-in-out infinite alternate}.hero-art-spectrum i:nth-child(3n){height:130px}.hero-art-spectrum i:nth-child(4n){height:70px}.hero-art-spectrum i:nth-child(5n){height:165px}.hero-art-spectrum i:nth-child(2n){height:95px}.hero-art-spectrum i:nth-child(7n){height:185px}.hero-art-spectrum i:nth-child(1){height:35px}.hero-art-spectrum i:nth-child(13){height:200px}.hero-art-spectrum i:nth-child(17){height:175px}.hero-art-spectrum i:nth-child(3n){animation-delay:.2s}.hero-art-spectrum i:nth-child(4n){animation-delay:.45s}.hero-art-spectrum i:nth-child(5n){animation-delay:.65s}
+.hero-art-center{position:relative;z-index:2;width:92px;height:92px;border:1px solid rgba(255,184,125,.38);border-radius:50%;display:grid;place-items:center;background:rgba(12,10,9,.78);box-shadow:0 0 0 12px rgba(255,106,0,.025),0 0 65px rgba(255,106,0,.18);color:#ffb16f;backdrop-filter:blur(10px)}.hero-art-center svg{width:56px;height:56px}.hero-art-caption{position:absolute;bottom:66px;left:22px;display:flex;align-items:center;gap:10px;z-index:3}.hero-art-caption b{display:block;color:#eee;font-size:10px;letter-spacing:1px}.hero-art-caption small{display:block;color:#888;font-size:11px;margin-top:5px}.caption-dot,.live-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#ff7b22;box-shadow:0 0 12px #ff6a00}
+.soundstage{min-height:390px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:30px;background:linear-gradient(145deg,#100d0b,#080808 70%);display:flex;align-items:center;justify-content:center}.soundstage-glow{position:absolute;width:330px;height:240px;border-radius:50%;background:rgba(255,106,0,.14);filter:blur(80px)}.soundstage-label{position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:9px;color:#999;font-size:9px;letter-spacing:2px}.sound-rings{position:absolute;width:300px;height:300px;display:grid;place-items:center}.sound-rings i{position:absolute;border:1px solid rgba(255,137,55,.18);border-radius:50%;width:100%;height:100%;transform:scaleY(.52) rotate(-18deg);animation:ringPulse 4s ease-in-out infinite}.sound-rings i:nth-child(2){width:80%;height:80%;animation-delay:.4s}.sound-rings i:nth-child(3){width:60%;height:60%;animation-delay:.8s}.sound-rings i:nth-child(4){width:40%;height:40%;animation-delay:1.2s}.sound-rings i:nth-child(5){width:120%;height:120%;border-color:rgba(255,255,255,.07);animation-delay:1.6s}.sound-core{position:relative;z-index:2;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,168,104,.4);background:rgba(255,106,0,.07);box-shadow:0 0 60px rgba(255,106,0,.14)}.sound-core-inner{color:#ffae6c;width:50px}.sound-core-inner svg{width:100%}.sound-bars{position:absolute;bottom:75px;display:flex;align-items:center;justify-content:center;gap:5px;width:90%;height:90px}.sound-bars i{width:4px;height:24px;border-radius:5px;background:linear-gradient(#ffd1a2,#ff6a00);animation:spectrumMove .9s ease-in-out infinite alternate}.sound-bars i:nth-child(3n){height:62px}.sound-bars i:nth-child(4n){height:35px}.sound-bars i:nth-child(5n){height:78px}.sound-bars i:nth-child(7n){height:48px}.sound-bars i:nth-child(2n){animation-delay:.25s}.sound-bars i:nth-child(3n){animation-delay:.4s}.sound-bars i:nth-child(5n){animation-delay:.6s}.soundstage-bottom{position:absolute;bottom:23px;left:24px;right:24px;display:flex;align-items:center;gap:12px;color:#777;font-size:8px;letter-spacing:1.5px}.soundstage-line{height:1px;flex:1;background:linear-gradient(90deg,rgba(255,106,0,.5),rgba(255,255,255,.05))}.experience-points{margin-top:20px;border-top:1px solid var(--line)}.experience-point{display:grid;grid-template-columns:55px 1fr 25px;align-items:center;gap:12px;padding:23px 4px;border-bottom:1px solid var(--line)}.point-number{font-size:11px;color:#ff9850;letter-spacing:1px}.experience-point b{font-size:15px;color:#eee}.experience-point p{font-size:12px;color:#888;line-height:1.6;margin-top:5px}.point-mark{color:#ff9850;font-size:19px}
+@keyframes spectrumMove{from{transform:scaleY(.35);opacity:.55}to{transform:scaleY(1);opacity:1}}@keyframes ringPulse{0%,100%{opacity:.35;scale:.96}50%{opacity:.9;scale:1.04}}@keyframes orbitBreath{0%,100%{opacity:.45;scale:.96}50%{opacity:1;scale:1.03}}
+@media(max-width:800px){.hero-art-visual{min-height:430px}.hero-art-spectrum{gap:3px;width:94%}.hero-art-spectrum i{width:4px}.hero-art-orbit{width:250px;height:250px}.orbit-two{width:320px;height:320px}.soundstage{min-height:330px}.sound-rings{width:230px;height:230px}.sound-bars{gap:3px}.sound-bars i{width:3px}.hero-art-caption{bottom:58px}.hero-art-label{font-size:7px;letter-spacing:1px}.experience-point{grid-template-columns:35px 1fr 20px}}
+@media(prefers-reduced-motion:reduce){.hero-art-spectrum i,.hero-art-orbit,.sound-rings i,.sound-bars i{animation:none!important}}
+
+
+/* Mobile scrolling performance: preserve the design while reducing repaint work */
+html{
+  scroll-behavior:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+}
+body{
+  text-rendering:optimizeLegibility;
+}
+@media(max-width:800px){
+  /* Large fixed blur layers are expensive to repaint during finger scrolling */
+  body:after{display:none!important}
+  body:before{opacity:.45}
+  .nav{
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    background:rgba(10,10,11,.94);
+  }
+  .phone,.phone-floating,.sticky-player{
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .phone{box-shadow:0 18px 35px rgba(0,0,0,.45),0 0 28px rgba(255,106,0,.10)}
+  .phone-floating{background:rgba(16,16,17,.96);box-shadow:0 12px 28px rgba(0,0,0,.28)}
+  .sticky-player{box-shadow:0 10px 28px rgba(0,0,0,.35)}
+  .visual-orb,.hero-art-halo,.soundstage-glow{filter:blur(28px)}
+  .reveal{
+    transition:opacity .35s ease;
+    transform:none!important;
+  }
+  .reveal.show{transform:none!important}
+  .phone-floating,.mini-bars i,.sticky-wave i{
+    animation:none!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+}
+
+
+/* Real Aurix UI screenshot gallery */
+.ui-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:start}
+.ui-shot{margin:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:24px;background:rgba(255,255,255,.035);box-shadow:0 18px 55px rgba(0,0,0,.3);transition:transform .3s,border-color .3s,box-shadow .3s}
+.ui-shot:hover{transform:translateY(-7px);border-color:rgba(255,106,0,.4);box-shadow:0 24px 65px rgba(255,106,0,.09)}
+.ui-shot button{display:block;width:100%;padding:0;border:0;background:#080808;cursor:zoom-in}
+.ui-shot img{display:block;width:100%;height:auto;aspect-ratio:9/19;object-fit:cover;object-position:top}
+.ui-shot figcaption{padding:13px 14px 15px;color:#bbb;font-size:12px;letter-spacing:.2px}
+.ui-shot figcaption span{display:block;color:#777;font-size:10px;margin-top:4px}
+.ui-lightbox{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.88);backdrop-filter:blur(12px)}
+.ui-lightbox.open{display:flex}
+.ui-lightbox img{display:block;max-width:min(92vw,520px);max-height:88vh;object-fit:contain;border-radius:16px;box-shadow:0 25px 100px #000}
+.ui-lightbox-close{position:absolute;top:18px;right:20px;width:44px;height:44px;border:1px solid #555;border-radius:50%;background:#171717;color:white;font-size:25px;cursor:pointer}
+@media(max-width:900px){.ui-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}}
+@media(max-width:600px){.ui-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.ui-shot{border-radius:18px}.ui-shot figcaption{padding:11px;font-size:11px}.ui-shot img{border-radius:0}.ui-lightbox{padding:12px}}
+
+</style>
+</head>
+
+<body>
+
+<!-- Floating music symbols -->
+<div class="note n1">♪</div>
+<div class="note n2">♫</div>
+<div class="note n3">♬</div>
+<div class="note n4">♪</div>
+
+<nav class="nav">
+  <a class="brand" href="#top">
+    <img src="https://i.ibb.co/Df5S5djP/Picsart-26-09-27-19-29-10-982.png" alt="Aurix logo">
+    <span>Aurix</span>
+  </a>
+  <div class="navlinks">
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+    <a href="#screens">Experience</a>
+    <a href="#ui-gallery">App UI</a>
+  </div>
+  <a class="navbtn" href="https://github.com/aurixpremium-beep/Aurix-/raw/refs/heads/main/Aurix.apk">Download</a>
+</nav>
+
+<main id="top">
+
+<section class="hero">
+  <div class="premium-hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot"></span> Your music. Your world.</div>
+      <h1><span>Music that</span><em>feels like yours.</em></h1>
+      <p>A beautifully crafted music player designed around the way you listen — clean, immersive, secure and completely free from distracting ads.</p>
+      <div class="hero-actions premium-actions">
+        <a class="download" href="https://github.com/aurixpremium-beep/Aurix-/raw/refs/heads/main/Aurix.apk" onclick="downloadPulse(event,this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
+          <span>Download Aurix</span>
+        </a>
+        <a class="secondary" href="#about">Explore Aurix · Free to Enjoy</a>
+      </div>
+      <div class="trust-strip">
+        <div class="trust-pill"><strong>Free</strong> to enjoy</div>
+        <div class="trust-pill"><strong>No ads</strong> in the experience</div>
+        <div class="trust-pill"><strong>Privacy</strong> focused</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-orb"></div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-top"><b>Aurix</b><span>9:41</span></div>
+          <img class="phone-art" src="https://i.ibb.co/Df5S5djP/Picsart-26-09-27-19-29-10-982.png" alt="Aurix music player artwork">
+          <div class="phone-song"><b>Now Playing</b><span>Music that feels alive</span></div>
+          <div class="phone-progress"></div>
+          <div class="phone-times"><span>1:24</span><span>3:48</span></div>
+          <div class="phone-controls">
+            <span>↶</span><span>‹</span>
+            <div class="play">▶</div>
+            <span>›</span><span>↷</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone-floating">
+        <b>Made to feel fast.</b>
+        <span>Quick interactions. Fluid motion. Zero clutter.</span>
+        <div class="mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+      </div></div>
+  </div>
+  <div class="scroll">Scroll to discover<span class="mouse"></span></div>
+</section>
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">About Aurix</div>
+      <h2>Music should feel alive.</h2>
+      <p class="lead">
+        I built Aurix to feel different. Every detail is shaped around the listening experience — quiet when it should be, beautiful when it matters, and secure by design. No ads breaking the moment. No clutter between you and your music.
+      </p>
+    </div>
+
+    <div class="showcase reveal" id="experience">
+      <div class="orbit"></div>
+      <div class="album">
+        <img src="https://i.ibb.co/Df5S5djP/Picsart-26-09-27-19-29-10-982.png" alt="Aurix artwork">
+      </div>
+      <div class="wave" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="ui-gallery">
+  <div class="container">
+    <div class="product-intro reveal">
+      <div class="kicker">Inside the app</div>
+      <h2>The Aurix interface.</h2>
+      <p class="lead">A closer look at the real screens — crafted for focused listening, warm visuals and a clean music experience. Tap any screenshot to view it larger.</p>
+    </div>
+    <div class="ui-gallery">
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/GQ2pBRw1/Screenshot-2026-10-19-12-53-15-02-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('Your music, at a glance', 'Home experience')">
+          <img src="https://i.ibb.co/GQ2pBRw1/Screenshot-2026-10-19-12-53-15-02-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 1: ('Your music, at a glance', 'Home experience')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Your music, at a glance', 'Home experience')<span> AURIX · APP SCREEN 01</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/nq3QhFYB/Screenshot-2026-10-19-12-53-21-08-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('Find your next favorite', 'Music discovery')">
+          <img src="https://i.ibb.co/nq3QhFYB/Screenshot-2026-10-19-12-53-21-08-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 2: ('Find your next favorite', 'Music discovery')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Find your next favorite', 'Music discovery')<span> AURIX · APP SCREEN 02</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/R4VtP695/Screenshot-2026-10-19-12-53-23-26-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('Your listening space', 'Library and playlists')">
+          <img src="https://i.ibb.co/R4VtP695/Screenshot-2026-10-19-12-53-23-26-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 3: ('Your listening space', 'Library and playlists')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Your listening space', 'Library and playlists')<span> AURIX · APP SCREEN 03</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/yJtFkbB/file-00000000089c8211a91b1735474e3b13.png" aria-label="View screenshot: ('Made for the details', 'Aurix interface')">
+          <img src="https://i.ibb.co/yJtFkbB/file-00000000089c8211a91b1735474e3b13.png" alt="Aurix app screenshot 4: ('Made for the details', 'Aurix interface')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Made for the details', 'Aurix interface')<span> AURIX · APP SCREEN 04</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/xpXN3wn/Screenshot-2026-10-19-12-54-01-38-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('A player that feels personal', 'Now playing')">
+          <img src="https://i.ibb.co/xpXN3wn/Screenshot-2026-10-19-12-54-01-38-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 5: ('A player that feels personal', 'Now playing')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('A player that feels personal', 'Now playing')<span> AURIX · APP SCREEN 05</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/C3BDzb6y/Screenshot-2026-10-19-12-54-04-21-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('Explore your collection', 'Browse music')">
+          <img src="https://i.ibb.co/C3BDzb6y/Screenshot-2026-10-19-12-54-04-21-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 6: ('Explore your collection', 'Browse music')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Explore your collection', 'Browse music')<span> AURIX · APP SCREEN 06</span></figcaption>
+      </figure>
+      <figure class="ui-shot reveal">
+        <button type="button" class="ui-shot-open" data-image="https://i.ibb.co/rG8F9k26/Screenshot-2026-10-19-12-54-16-35-79f45e929bd5465fc603477124fb0fd8.jpg" aria-label="View screenshot: ('Every beat, beautifully', 'Playback experience')">
+          <img src="https://i.ibb.co/rG8F9k26/Screenshot-2026-10-19-12-54-16-35-79f45e929bd5465fc603477124fb0fd8.jpg" alt="Aurix app screenshot 7: ('Every beat, beautifully', 'Playback experience')" loading="lazy" decoding="async">
+        </button>
+        <figcaption>('Every beat, beautifully', 'Playback experience')<span> AURIX · APP SCREEN 07</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+<div class="ui-lightbox" id="uiLightbox" role="dialog" aria-modal="true" aria-label="Expanded Aurix screenshot">
+  <button class="ui-lightbox-close" type="button" aria-label="Close screenshot">×</button>
+  <img id="uiLightboxImage" src="" alt="Expanded Aurix app screenshot">
+</div>
+
+<section class="section product-section" id="screens">
+  <div class="container">
+    <div class="product-intro reveal"><div class="kicker">A different kind of listening</div><h2>Feel the sound.<br>Not the noise.</h2><p class="lead">A space for your music, shaped by atmosphere, motion and the moments that matter.</p></div>
+    <div class="soundstage reveal" aria-label="Abstract animated soundwave design">
+      <div class="soundstage-glow"></div><div class="soundstage-label"><span class="live-dot"></span> YOUR SOUND, YOUR SPACE</div>
+      <div class="sound-rings"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="sound-core"><div class="sound-core-inner"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 50h9l6-17 9 36 9-48 9 58 9-39 9 23 8-13h24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="soundstage-bottom"><span>PRESS PLAY</span><span class="soundstage-line"></span><span>LOSE YOURSELF IN IT</span></div>
+    </div>
+    <div class="experience-points">
+      <div class="experience-point reveal"><span class="point-number">01</span><div><b>Made for the moment</b><p>A calm, focused experience that lets your music take the lead.</p></div><span class="point-mark">↗</span></div>
+      <div class="experience-point reveal"><span class="point-number">02</span><div><b>Motion with meaning</b><p>Subtle movement, warm light and details that feel intentional.</p></div><span class="point-mark">↗</span></div>
+      <div class="experience-point reveal"><span class="point-number">03</span><div><b>Your music, uninterrupted</b><p>No decorative clutter competing with the listening experience.</p></div><span class="point-mark">↗</span></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container"><div class="section-head reveal"><div class="kicker">The Aurix philosophy</div><h2>No distractions.<br>No clutter. Just your music.</h2><p class="lead">Aurix keeps the experience focused on what matters: discovering songs, pressing play and getting lost in the sound.</p></div>
+    <div class="section-symbols"><div class="symbol-card reveal"><div class="symbol-icon">◉</div><b>Focus</b><span>A clean interface that keeps the music at the center.</span></div><div class="symbol-card reveal"><div class="symbol-icon">◇</div><b>Privacy</b><span>Designed with a security-first mindset and less unnecessary clutter.</span></div><div class="symbol-card reveal"><div class="symbol-icon">∞</div><b>Flow</b><span>Fluid interactions that stay out of your way while you listen.</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Built for listening</div>
+      <h2>Simple on the surface. Powerful underneath.</h2>
+      <p class="lead">A focused experience with the details that make a music player feel premium.</p>
+    </div>
+
+    <div class="features">
+      <article class="card reveal">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>
+          </svg>
+        </div>
+        <h3>Your Music</h3>
+        <p>Keep your listening experience centered around the songs you actually love.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/>
+          </svg>
+        </div>
+        <h3>Beautiful Interface</h3>
+        <p>Dark, vibrant visuals with smooth transitions and an orange signature glow.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M13 2 3 14h8l-1 8 10-12h-8z"/>
+          </svg>
+        </div>
+        <h3>Made to Feel Fast</h3>
+        <p>Quick interactions, fluid motion and a player designed for everyday listening.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 7h16M7 7V5h10v2M6 10v9h12v-9"/>
+            <path d="M9 13h6"/>
+          </svg>
+        </div>
+        <h3>Ad-Free</h3>
+        <p>Enjoy your music without ads getting in the way.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta reveal">
+      <div class="kicker">Ready to listen?</div>
+      <h2>Put your music in motion.</h2>
+      <p>
+        Download Aurix and experience a music player made with a little more personality.
+      </p>
+      <a class="download" style="display:inline-flex"
+         href="https://github.com/aurixpremium-beep/Aurix-/raw/refs/heads/main/Aurix.apk"
+         onclick="downloadPulse(event,this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/>
+        </svg>
+        <span>Get Aurix</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div style="margin-bottom:8px;">
+      © <span id="year"></span> <b>Aurix</b>. All rights reserved.
+    </div>
+    <div style="color:#777;">
+      Developed by <b style="color:#aaa;">Anshu Sharma</b> ·
+      Built for friends, music lovers, and everyone who simply loves great music.
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Scroll reveal */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('show');
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:.14});
+reveals.forEach(el=>observer.observe(el));
+
+/* Full-screen touch feedback */
+document.addEventListener('pointerdown',(e)=>{
+  const pulse=document.createElement('span');
+  pulse.className='touch-pulse';
+  pulse.style.left=e.clientX+'px';
+  pulse.style.top=e.clientY+'px';
+  document.body.appendChild(pulse);
+
+  setTimeout(()=>pulse.remove(),450);
+},{passive:true});
+
+/* Download button feedback */
+function downloadPulse(e, btn){
+  btn.style.transform='translateY(-2px) scale(.98)';
+  setTimeout(()=>btn.style.transform='',180);
+}
+
+/* Small parallax effect on desktop only; avoid transform work during touch scrolling */
+const logo = document.querySelector('.logo-wrap');
+if (logo && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  window.addEventListener('pointermove',(e)=>{
+    const x=(e.clientX/window.innerWidth-.5)*10;
+    const y=(e.clientY/window.innerHeight-.5)*10;
+    logo.style.transform=`translate3d(${x}px,${y}px,0)`;
+  },{passive:true});
+}
+
+document.getElementById('year').textContent=new Date().getFullYear();
+</script>
+<div class="sticky-player" id="stickyPlayer">
+  <img src="https://i.ibb.co/Df5S5djP/Picsart-26-09-27-19-29-10-982.png" alt="Aurix">
+  <div class="track"><b>Music that feels alive</b><span>Now playing on Aurix</span></div>
+  <div class="sticky-wave"><i></i><i></i><i></i></div>
+  <button class="sticky-play" aria-label="Play">▶</button>
+</div>
+
+<script>
+
+/* Real app screenshot gallery lightbox */
+(() => {
+  const lightbox = document.getElementById('uiLightbox');
+  const lightboxImage = document.getElementById('uiLightboxImage');
+  const closeButton = lightbox.querySelector('.ui-lightbox-close');
+  const close = () => {
+    lightbox.classList.remove('open');
+    lightboxImage.src = '';
+    document.body.style.overflow = '';
+  };
+  document.querySelectorAll('.ui-shot-open').forEach(button => {
+    button.addEventListener('click', () => {
+      lightboxImage.src = button.dataset.image;
+      lightboxImage.alt = button.querySelector('img').alt;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      closeButton.focus();
+    });
+  });
+  closeButton.addEventListener('click', close);
+  lightbox.addEventListener('click', event => {
+    if (event.target === lightbox) close();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && lightbox.classList.contains('open')) close();
+  });
+})();
+
+</script>
+</body>
+</html>
